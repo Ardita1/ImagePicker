@@ -24,22 +24,23 @@ open class AssetManager {
     return UIImage(named: name, in: bundle, compatibleWith: traitCollection) ?? UIImage()
   }
 
-  public static func fetch(withConfiguration configuration: ImagePickerConfiguration, _ completion: @escaping (_ assets: [PHAsset]) -> Void) {
-      DispatchQueue.global(qos: .background).async {
-          guard PHPhotoLibrary.authorizationStatus() == .authorized else { return }
-              let fetchOptions = PHFetchOptions()
-              fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-              
-              let fetchResult = configuration.allowVideoSelection
-              ? PHAsset.fetchAssets(with: fetchOptions)
-              : PHAsset.fetchAssets(with: .image, options: fetchOptions)
-              
-              let count = min(fetchResult.count, 100)
-              let assets = fetchResult.objects(at: IndexSet(0..<count))
-              completion(assets)
-          }
-  }
+    public static func fetch(withConfiguration configuration: ImagePickerConfiguration, _ completion: @escaping (_ assets: [PHAsset]) -> Void) {
+        DispatchQueue.global(qos: .background).async {
+            guard PHPhotoLibrary.authorizationStatus() == .authorized else { return }
+                let fetchOptions = PHFetchOptions()
+                fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+                
+                let fetchResult = configuration.allowVideoSelection
+                ? PHAsset.fetchAssets(with: fetchOptions)
+                : PHAsset.fetchAssets(with: .image, options: fetchOptions)
+                
+                let count = min(fetchResult.count, 100)
+                let assets = fetchResult.objects(at: IndexSet(0..<count))
+                completion(assets)
+            }
+    }
 
+    
   public static func resolveAsset(_ asset: PHAsset, size: CGSize = CGSize(width: 720, height: 1280), shouldPreferLowRes: Bool = false, completion: @escaping (_ image: UIImage?) -> Void) {
     let imageManager = PHImageManager.default()
     let requestOptions = PHImageRequestOptions()

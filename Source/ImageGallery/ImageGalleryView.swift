@@ -174,15 +174,53 @@ open class ImageGalleryView: UIView {
 
   // MARK: - Photos handler
 
-  func fetchPhotos(_ completion: (() -> Void)? = nil) {
-    AssetManager.fetch(withConfiguration: configuration) { assets in
-      self.assets.removeAll()
-      self.assets.append(contentsOf: assets)
-      self.collectionView.reloadData()
+//    let cache = NSCache<NSString, [PHAsset]>()
+//
+//    func fetchPhotos(_ completion: (() -> Void)? = nil) {
+//      if let assets = cache.object(forKey: "assets") {
+//        self.assets.removeAll()
+//        self.assets.append(contentsOf: assets)
+//        self.collectionView.reloadData()
+//
+//        completion?()
+//        return
+//      }
+//
+//      AssetManager.fetch(withConfiguration: configuration) { assets in
+//        self.assets.removeAll()
+//        self.assets.append(contentsOf: assets)
+//        self.collectionView.reloadData()
+//
+//        cache.setObject(assets, forKey: "assets")
+//
+//        completion?()
+//      }
+//    }
 
-      completion?()
+    func fetchPhotos(_ completion: (() -> Void)? = nil) {
+      DispatchQueue.global().async {
+        AssetManager.fetch(withConfiguration: self.configuration) { assets in
+          DispatchQueue.main.async {
+            self.assets.removeAll()
+            self.assets.append(contentsOf: assets)
+            self.collectionView.reloadData()
+            
+            completion?()
+          }
+        }
+      }
     }
-  }
+
+    
+//  func fetchPhotos(_ completion: (() -> Void)? = nil) {
+//    AssetManager.fetch(withConfiguration: configuration) { assets in
+//      self.assets.removeAll()
+//      self.assets.append(contentsOf: assets)
+//      self.collectionView.reloadData()
+//
+//      completion?()
+//    }
+//  }
 
   // MARK: - Pan gesture recognizer
 
